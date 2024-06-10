@@ -29,7 +29,12 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-app.engine("handlebars", expressHandlebars.engine());
+app.engine('handlebars', expressHandlebars.engine({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true
+  }
+}));
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use(express.static(__dirname + "/public"));
@@ -37,8 +42,7 @@ app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const productsRouter = require("./routes/products.js")(io);
-//const cartsRouter = require("./routes/carts.js");
+
 const productsRouter = require ("./routes/products.routers.js")
 const cartsRouter = require("./routes/carts.routers.js");
 const viewsRouter = require("./routes/views.js");
