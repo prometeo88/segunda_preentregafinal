@@ -4,7 +4,27 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        let products = await productsModel.find();
+        const { limit = 10, page = 1, sort, query } = req.query;
+
+        
+        let filter = {};
+        if (query) {
+            filter = { $or: [
+                { title: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } },
+                { category: { $regex: query, $options: 'i' } }
+            ]};
+        }
+
+
+        const options = {
+            limit: parseInt(limit, 10),
+            page: parseInt(page, 10),
+            sort: sort ? { title: parseInt(sort, 10) } : {}
+        };
+
+         const products = await productsModel.paginate(filter, options);
+
         res.send({ result: "success", payload: products });
     } catch (error) {
         console.log(error);
