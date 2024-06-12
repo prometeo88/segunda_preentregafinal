@@ -21,9 +21,15 @@ router.get('/', async (req, res) => {
             limit: parseInt(limit, 10),
             page: parseInt(page, 10),
             sort: sort ? { title: parseInt(sort, 10) } : {}
-        };
+             };
+        
 
          const products = await productsModel.paginate(filter, options);
+        products.prevLink = products.hasPrevPage ? `http://localhost:8080/api/products/?page=${products.prevPag}` : ``
+        products.nextLink = products.hasNextPage ? `http://localhost:8080/api/products/?page=${products.nextPage}` : ``
+        products.isValid = (page <= 0) || page > products.totalpages
+        console.log(products.prevLink) 
+
 
         res.send({ result: "success", payload: products });
     } catch (error) {
