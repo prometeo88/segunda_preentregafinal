@@ -56,16 +56,15 @@ app.use("/", viewsRouter);
 app.use("/api/users",usersRouter)
 app.use("/api/messages",messagesRouter)
 
-mongoose
-  .connect(
-    "mongodb+srv://fullua:123456789fullua@fedeu.z6zxkgk.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=FedeU"
-  )
-  .then(() => {
+const conectarBase = async() => {
+  try {
+    await mongoose.connect('mongodb+srv://fullua:123456789fullua@fedeu.z6zxkgk.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=FedeU');
     console.log("Conectado a la base de datos");
-  })
-  .catch((error) =>
-    console.error("Error en la conexion de la base de datos", error)
-  );
+  } catch (error) {
+    console.error("Error en la conexión de la base de datos", error);
+  }
+};
+  conectarBase();
 
 server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
