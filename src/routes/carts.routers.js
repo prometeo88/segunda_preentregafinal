@@ -56,12 +56,49 @@ router.put('/:cid', async (req, res) => {
     }
 });    
 
+router.put('/:cid/products/:pid', async (req, res) => {
+    try {
+        const cartId = req.params.cid;
+              
+        const productId = req.params.pid;
+
+        const {quantity} = req.body;
+
+        if(quantity === undefined ){
+            return res.status(400).json({ result: "error", message: "No hay cantidad definida" });
+        }
+
+        let cart = await cartsModel.findById(cartId)
+
+        if (cart) {
+            
+            let product = cart.product.find(product => product._id.toString() === productId)
+
+            if(product){
+                product.quantity = quantity;
+                await cart.save();
+            }
+
+            res.json({ result: "success - cantidad actualizada", payload: cart });
+        } else {
+            res.status(404).json({ result: "error", message: "Producto no encontrado" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ result: "error", message: error.message });
+    }
+}); 
+
 router.delete('/:cid', async (req, res) => {
     try {
         const cartId = req.params.cid;
-        let cart = await cartsModel.findByIdAndDelete(cartId);
+        let cart = await cartsModel.findById(cartId);
         if (cart) {
-            res.json({ result: "success", payload: cart });
+           cart.product = []
+           
+           await cart.save();
+           
+            res.json({ result: "Success - Eliminado todos los productos del carrito", payload: cart });
         } else {
             res.status(404).json({ result: "error", message: "Cart not found" });
         }
@@ -78,13 +115,13 @@ router.delete('/:cid/products/:pid', async (req, res) => {
         let cart = await cartsModel.findById(cartId);
 
         if (cart) {
-            // Longitud original del array de productos
+            
             const originalLength = cart.product.length;
             
-            // Filtrar el producto con el ID proporcionado
+            
             cart.product = cart.product.filter(product => product._id.toString() !== productId);
             
-            // Verificar si se eliminó algún producto
+            
             if (cart.product.length < originalLength) {
                 await cart.save();
                 res.json({ result: "success producto eliminado", payload: cart });
