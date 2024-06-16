@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const cartsCollection = "Carts"
 
@@ -11,6 +12,8 @@ const cartsSchema = new mongoose.Schema({
     quantity: { type: Number, required: true }  
   }]
 });
+
+cartsSchema.plugin(mongoosePaginate);
 
   const cartsModel = mongoose.model(cartsCollection,cartsSchema)
 

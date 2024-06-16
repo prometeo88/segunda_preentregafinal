@@ -40,6 +40,42 @@ router.post('/', async (req, res) => {
     }
 });  
 
+router.post('/:cid/products/:pid', async (req, res) => {
+    try {
+        const cartId = req.params.cid;
+        const productId = req.params.pid
+        const {quantity} = req.body
+
+        if(quantity === undefined){
+            return res.status(400).json({ result: "error", message: "No hay cantidad definida" });
+        }
+
+        let cart = await cartsModel.findById(cartId);
+
+        if(cart){
+            let cartProduct = cart.products.find(p => p.product.toString() === productId);
+
+            if (cartProduct) {
+                
+                cartProduct.quantity === quantity;
+            } else {
+                
+                cart.products.push({ product: productId, quantity });
+            }
+
+            await cart.save();
+            cart = await cart.populate('products.product');
+
+            return res.status(201).json({ result: "success - cargado el producto al carrito", payload: cart });
+        } else {
+            return res.status(404).json({ result: "error", message: "Carrito no encontrado" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ result: "error", message: error.message });
+    }
+});
+
 router.put('/:cid', async (req, res) => {
     try {
         const cartId = req.params.cid;
